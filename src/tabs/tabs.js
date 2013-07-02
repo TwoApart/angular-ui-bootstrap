@@ -175,6 +175,7 @@ function($parse, $http, $templateCache, $compile) {
     transclude: true,
     scope: {
       heading: '@',
+      headingClass: '@',
       onSelect: '&select' //This callback is called in contentHeadingTransclude
                           //once it inserts the tab's content into the dom
     },
