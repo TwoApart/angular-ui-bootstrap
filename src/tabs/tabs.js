@@ -176,6 +176,7 @@ function($parse, $http, $templateCache, $compile) {
     scope: {
       heading: '@',
       headingClass: '@',
+      disabled: '=',
       onSelect: '&select' //This callback is called in contentHeadingTransclude
                           //once it inserts the tab's content into the dom
     },
@@ -208,13 +209,8 @@ function($parse, $http, $templateCache, $compile) {
           }
         });
 
-        scope.disabled = false;
-        if ( attrs.disabled ) {
-          scope.$parent.$watch($parse(attrs.disabled), function(value) {
-            scope.disabled = !! value;
-          });
-        }
-
+        scope.disabled = scope.disabled || false;
+       
         scope.select = function() {
           if ( ! scope.disabled ) {
             scope.active = true;
