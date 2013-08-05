@@ -125,7 +125,9 @@ dialogModule.provider("$dialog", function(){
           self.modalEl.children().data('ngControllerController', ctrl);
         }
 
-        $compile(self.modalEl)($scope);
+        if (options.compile=== undefined || options.compile===true) {
+            $compile(self.modalEl)($scope);
+        }
         self._addElementsToDom();
 
         // trigger tranisitions
