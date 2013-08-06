@@ -101,7 +101,8 @@ angular.module( 'ui.bootstrap.tooltip', [ 'ui.bootstrap.position' ] )
           'content="'+startSym+'tt_content'+endSym+'" '+
           'placement="'+startSym+'tt_placement'+endSym+'" '+
           'animation="tt_animation()" '+
-          'is-open="tt_isOpen"'+
+          'is-open="tt_isOpen" '+
+          directiveName + '-class="tt_class"' +
           '>'+
         '</'+ directiveName +'-popup>';
 
@@ -183,7 +184,7 @@ angular.module( 'ui.bootstrap.tooltip', [ 'ui.bootstrap.position' ] )
             
             // Calculate the tooltip's top and left coordinates to center it with
             // this directive.
-            switch ( scope.tt_placement ) {
+            switch ( scope.tt_position ) {
               case 'mouse':
                 var mousePos = $position.mouse();
                 ttPosition = {
@@ -207,6 +208,18 @@ angular.module( 'ui.bootstrap.tooltip', [ 'ui.bootstrap.position' ] )
                 ttPosition = {
                   top: position.top + position.height / 2 - ttHeight / 2,
                   left: position.left - ttWidth
+                };
+                break;
+              case 'top-left':
+                ttPosition = {
+                  top: position.top - ttHeight,
+                  left: position.left
+                };
+                break;
+              case 'top-right':
+                ttPosition = {
+                  top: position.top - ttHeight,
+                  left: position.left + position.width - ttWidth
                 };
                 break;
               default:
@@ -239,15 +252,35 @@ angular.module( 'ui.bootstrap.tooltip', [ 'ui.bootstrap.position' ] )
             // need to wait for it to expire beforehand.
             // FIXME: this is a placeholder for a port of the transitions library.
             if ( angular.isDefined( scope.tt_animation ) && scope.tt_animation() ) {
-              transitionTimeout = $timeout( function () { tooltip.remove(); }, 500 );
+              transitionTimeout = $timeout( function () { tooltip.css({display: 'none'}); }, 500 );
             } else {
-              tooltip.remove();
+              tooltip.css({display: 'none'});
             }
           }
+          scope.hide = hide; // making hide visible to interact from template
 
           /**
            * Observe the relevant attributes.
            */
+          var defaultClass = { in: "isOpen()", fade: "animation()" };
+          attrs.$observe( prefix+'Class', function (val) {
+            scope.tt_class = defaultClass;
+            if (angular.isString(val)) {
+              var classes = val.split(" ");
+              angular.forEach(classes, function(value) {
+                scope.tt_class[value] = true;
+              });
+            } else if (angular.isArray(val)) {
+              angular.forEach(val, function(value) {
+                scope.tt_class[value] = true;
+              });
+            } else if (angular.isObject(val)) {
+              angular.forEach(val, function(value, key){
+                scope.tt_class[key] = value;
+              });
+            }
+          });
+
           attrs.$observe( type, function ( val ) {
             scope.tt_content = val;
           });
@@ -257,7 +290,8 @@ angular.module( 'ui.bootstrap.tooltip', [ 'ui.bootstrap.position' ] )
           });
 
           attrs.$observe( prefix+'Placement', function ( val ) {
-            scope.tt_placement = angular.isDefined( val ) ? val : options.placement;
+            scope.tt_position = angular.isDefined( val ) ? val : options.placement;
+            scope.tt_placement = scope.tt_position.split("-")[0];
           });
 
           attrs.$observe( prefix+'Animation', function ( val ) {
@@ -321,7 +355,7 @@ angular.module( 'ui.bootstrap.tooltip', [ 'ui.bootstrap.position' ] )
   return {
     restrict: 'E',
     replace: true,
-    scope: { content: '@', placement: '@', animation: '&', isOpen: '&' },
+    scope: { content: '@', placement: '@', animation: '&', isOpen: '&', tooltipClass: '=' },
     templateUrl: 'template/tooltip/tooltip-popup.html'
   };
 })
@@ -334,7 +368,7 @@ angular.module( 'ui.bootstrap.tooltip', [ 'ui.bootstrap.position' ] )
   return {
     restrict: 'E',
     replace: true,
-    scope: { content: '@', placement: '@', animation: '&', isOpen: '&' },
+    scope: { content: '@', placement: '@', animation: '&', isOpen: '&', tooltipClass: '=' },
     templateUrl: 'template/tooltip/tooltip-html-unsafe-popup.html'
   };
 })

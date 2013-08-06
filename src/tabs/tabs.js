@@ -188,8 +188,8 @@ function($parse, $http, $templateCache, $compile) {
       heading: '@',
       headingClass: '@',
       disabled: '=',
-      onSelect: '&select' //This callback is called in contentHeadingTransclude
-                          //once it inserts the tab's content into the dom
+      onSelect: '&select',  // This callback is called in contentHeadingTransclude
+                            // once it inserts the tab's content into the dom
       onDeselect: '&deselect'
     },
     controller: function() {
